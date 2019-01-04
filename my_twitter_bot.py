@@ -70,7 +70,7 @@ def reply_to_mentions():
 def advertise_video(vidlink):
     audience = api.search(q="Tesla Model S 3 X") # filters out tweets with these keywords
     audience_filter = ['Tesla', 'Model 3', 'Model X', 'Model S', 'Tesla Atari', 'Tesla Update', 'Tesla Air Update', 'Tesla Game', 'Games on Tesla', 'Tesla Plays Games', 'Video Games on Tesla'] # filters out tweets that contain these phrases
-    for tweet in audience(:10): # only find first 10 tweets at a time.
+    for tweet in audience:
         for phrase in audience_filter:
             if phrase in tweet.text:
                 print("Found a tweet! Tweeting video link") # for debugging
