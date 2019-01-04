@@ -13,7 +13,7 @@ ACCESS_SECRET = 'nIMTytpFgrSK7VmgTWGOgl4NikeHdmP4m2YVbPwox3POF'
 auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
 auth.set_access_token(ACCESS_KEY,ACCESS_SECRET)
 api = tweepy.API(auth)
-
+video_link = 'https://www.youtube.com/watch?v=YWpuOrxIcXg&t=9s'
 FILE_NAME = 'last_seen_id.txt'
 
 #DEV NOTE: use 1075836624099893248 for testing
@@ -48,7 +48,7 @@ def where_is_roadster():
 # Get the message containing the information on the Roadster's distance from Earth and Mars
 distance = where_is_roadster()
 
-def reply_to_tweets():
+def reply_to_mentions():
     print('retrieving and replying to tweets...')
     last_seen_id = retrieve_last_seen_id(FILE_NAME)
     # NOTE: We need to use tweet_mode='extended' below to show
@@ -61,14 +61,27 @@ def reply_to_tweets():
         print(str(mention.id) + ' - ' + mention.full_text)
         last_seen_id = mention.id
         store_last_seen_id(last_seen_id, FILE_NAME)
-        if '#wheresroadster' in mention.full_text.lower() or 'roadster' in mention.full_text.lower():
+        if '#wheresroadster' in mention.full_text.lower() or 'roadster' in mention.full_text.lower() or 'starman' in mention.full_text.lower():
             print('found roadster!')
             print('responding back...')
             api.update_status('@' + mention.user.screen_name + " " + 
                     distance[distance.find("Roadster's"):], mention.id)
 
+def advertise_video(vidlink):
+    audience = api.search(q="Tesla Model S 3 X") # filters out tweets with these keywords
+    audience_filter = ['Tesla', 'Model 3', 'Model X', 'Model S', 'Tesla Atari', 'Tesla Update', 'Tesla Air Update', 'Tesla Game', 'Games on Tesla', 'Tesla Plays Games', 'Video Games on Tesla'] # filters out tweets that contain these phrases
+    for tweet in audience(:10): # only find first 10 tweets at a time.
+        for phrase in audience_filter:
+            if phrase in tweet.text:
+                print("Found a tweet! Tweeting video link") # for debugging
+                sn = tweet.user.screen_name # get the username of the tweeter
+                reply = "@%s For those who want to know how to play Atari games with a controller in Tesla cars! " % sn
+                reply = reply + video_link #add the video link to the reply
+                tweet = api.update_status(reply, tweet.id)
+
 while True:
-    reply_to_tweets() # call the function which does all the replying
+    reply_to_mentions() # call the function which does all the replying
+    advertise_video(video_link)
     time.sleep(900) # loop code every 15 MINUTES
 
 """
@@ -77,4 +90,5 @@ References/Resources Used:
     2) https://stackoverflow.com/a/31758803
     3) https://docs.python.org/3/library/urllib.request.html
     4) https://www.crummy.com/software/BeautifulSoup/bs4/doc/
+    5) https://dototot.com/reply-tweets-python-tweepy-twitter-bot/
 """
