@@ -67,17 +67,26 @@ def reply_to_mentions():
             api.update_status('@' + mention.user.screen_name + " " + 
                     distance[distance.find("Roadster's"):], mention.id)
 
-def advertise_video(vidlink):
-    audience = api.search(q="Tesla Model S 3 X") # filters out tweets with these keywords
+def advertise_video(vidlink, num_replies=0, max_replies=10):
+    audience = api.search(q="Tesla Model S 3 X Y",count=100) # filters out tweets with these keywords; gets up to 100 that satisfy the criteria
+    print(len(audience)) # for debugging
     audience_filter = ['Tesla', 'Model 3', 'Model X', 'Model S', 'Tesla Atari', 'Tesla Update', 'Tesla Air Update', 'Tesla Game', 'Games on Tesla', 'Tesla Plays Games', 'Video Games on Tesla'] # filters out tweets that contain these phrases
     for tweet in audience:
-        for phrase in audience_filter:
-            if phrase in tweet.text:
-                print("Found a tweet! Tweeting video link") # for debugging
-                sn = tweet.user.screen_name # get the username of the tweeter
-                reply = "@%s For those who want to know how to play Atari games with a controller in Tesla cars! " % sn
-                reply = reply + video_link #add the video link to the reply
-                tweet = api.update_status(reply, tweet.id)
+        if num_replies < max_replies:
+            for phrase in audience_filter:
+                if phrase in tweet.text:
+                    sn = tweet.user.screen_name # get the username of the tweeter
+                    reply = "@%s For those who want to know how to play Atari games with a controller in Tesla cars! " % sn
+                    reply = reply + video_link # add the video link to the reply
+                    try:                       # if we've already tweeted this user, then skip
+                        tweet = api.update_status(reply, tweet.id) # tweet reply
+                        print("Found a tweet! Tweeting video link") # for debugging
+                        num_replies += 1
+                    except:
+                        print("skipping")
+                        pass
+        else:
+            break # if we've already replied to the max number of people specified
 
 while True:
     reply_to_mentions() # call the function which does all the replying
